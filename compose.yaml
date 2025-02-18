@@ -1,0 +1,31 @@
+services:
+  aspnet-server:
+    build:
+      context: ./EscapeLifeServer
+      dockerfile: Dockerfile
+    image: escapelifeserver
+    container_name: escapelifeserver-container
+    ports:
+      - "5190:5190"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5190
+      - ConnectionStrings__DefaultConnection=Server=mssql-server,1433;Initial Catalog=EscapeLifeDB;Persist Security Info=False;User=sa;Password=Password1*;TrustServerCertificate=True;MultipleActiveResultSets=True;
+    depends_on:
+      - mssql-server
+
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-container
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password1*
+      - MSSQL_PID=Express
+    ports:
+      - "1400:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+volumes:
+  mssql-data:
+    driver: local
